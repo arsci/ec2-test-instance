@@ -6,9 +6,11 @@ Used for spinning up a quick EC2 test instance.
 
 `[ec2-test.config.example.yml](ec2-test.config.example.yml)`
 
-For use with aws-deployments repo script
+For use with [aws-deployments](https://github.com/arsci/aws-deployments)
 
-## aws-deployments script
+## Deployment
+
+For use with [aws-deployments](https://github.com/arsci/aws-deployments)
 
 `python deploy_aws.py --config_files config/ec2-test.config.example.yml --template_file infra/ec2-test.cfn.yml`
 
