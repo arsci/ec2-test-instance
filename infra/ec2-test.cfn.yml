@@ -106,7 +106,7 @@ Resources:
               - Effect: Allow
                 Action: 's3:*'
                 Resource: !GetAtt rS3Bucket.Arn
-      
+
   rEC2Instance:    
     Type: AWS::EC2::Instance
     Properties: 
