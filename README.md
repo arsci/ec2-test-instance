@@ -8,9 +8,9 @@ The instance will text reminders/alerts to a specified phone number (via cron jo
 
 This is used as a reminder that an instance is running (useful if running a a larger higher cost instance) in case you forget to shut it down  
 
-    * Alerts when instance is created  
-    * Alerts when instance starts/reboots  
-    * Alerts every hour that instance is running  
+  * Alerts when instance is created  
+  * Alerts when instance starts/reboots  
+  * Alerts every hour that instance is running  
     
 ![alert-text.png](../img/alert-text.png)  
 
