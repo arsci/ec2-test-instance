@@ -12,7 +12,7 @@ This is used as a reminder that an instance is running (useful if running a a la
   * Alerts when instance starts/reboots  
   * Alerts every hour that instance is running  
     
-![alert-text.png](../img/alert-text.png)  
+![alert-text.png](img/alert-text.png)  
 
 ## Config File  
 
