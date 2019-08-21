@@ -39,6 +39,10 @@ Parameters:
     Type: String
     Description: 'The phone number to alert'
     
+  pAMIId:
+    Type: String
+    Description: 'The AMI ID'
+    
 Resources:
 
   rS3Bucket:
@@ -88,21 +92,25 @@ Resources:
             }
           ]
         }
-      ManagedPolicyArns: 
-        - 'arn:aws:iam::aws:policy/AdministratorAccess'
       Policies: 
-        - PolicyName: 'DenyIAM'
+        - PolicyName: 'AllowS3'
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
-              - Effect: Deny
-                Action: 'iam:*'
-                Resource: '*'
-
+              - Effect: Allow
+                Action: [
+                  's3:ListBucket',
+                  's3:ListAllMyBuckets'
+                ]
+                Resource: 'arn:aws:s3:::*'
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: !GetAtt rS3Bucket.Arn
+      
   rEC2Instance:    
     Type: AWS::EC2::Instance
     Properties: 
-      ImageId: 'ami-082b5a644766e0e6f'
+      ImageId: !Ref pAMIId
       IamInstanceProfile: !Ref rEC2InstanceProfile
       BlockDeviceMappings:
         - DeviceName: '/dev/xvda'
