@@ -1,5 +1,5 @@
-Description: >
-  AWS deployment helper script example (S3)
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 Test Instance Template'
   
 Parameters:
 
