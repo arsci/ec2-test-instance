@@ -1,0 +1,123 @@
+Description: >
+  AWS deployment helper script example (S3)
+  
+Parameters:
+
+  pServiceName:
+    Type: String
+    Description: 'The name of the service this template deploys'
+    
+  pDeploymentGroup:
+    Type: String
+    Description: 'Deployment Group'
+    
+  pMyIP:
+    Type: String
+    Description: 'EC2 SG CIDR SSH'
+    
+  pVpcId:
+    Type: String
+    Description: 'The VPC ID'
+  
+  pKeyName:
+    Type: String
+    Description: 'The EC2 KeyPair Name'
+    
+  pSubnetId:
+    Type: String
+    Description: 'The subnet to launch the instance into'
+    
+  pAvailabilityZone:
+    Type: String
+    Description: 'The AZ'
+    
+  pInstanceType:
+    Type: String
+    Description: 'The Instance type to launch'
+  
+  pPhoneNumber:
+    Type: String
+    Description: 'The phone number to alert'
+    
+Resources:
+
+  rS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      Tags:
+        - Key: 'pServiceName'
+          Value: !Ref pServiceName
+        - Key: 'pDeploymentGroup'
+          Value: !Ref pDeploymentGroup
+
+  rEC2SG:
+    Type: AWS::EC2::SecurityGroup
+    Properties: 
+      GroupDescription: 'EC2 SG'
+      SecurityGroupEgress: 
+        - FromPort: -1
+          IpProtocol: -1
+          ToPort: -1
+          CidrIp: '0.0.0.0/0'
+      SecurityGroupIngress: 
+        - FromPort: -1
+          IpProtocol: -1
+          ToPort: -1
+          CidrIp: !Ref pMyIP
+      VpcId: !Ref pVpcId
+
+  rEC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref rEC2InstanceRole
+   
+  rEC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: |
+        {
+          "Version": "2008-10-17", 
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole", 
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              }, 
+              "Effect": "Allow"
+            }
+          ]
+        }
+      ManagedPolicyArns: 
+        - 'arn:aws:iam::aws:policy/AdministratorAccess'
+      Policies: 
+        - PolicyName: 'DenyIAM'
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Deny
+                Action: 'iam:*'
+                Resource: '*'
+
+  rEC2Instance:    
+    Type: AWS::EC2::Instance
+    Properties: 
+      ImageId: 'ami-082b5a644766e0e6f'
+      IamInstanceProfile: !Ref rEC2InstanceProfile
+      BlockDeviceMappings:
+        - DeviceName: '/dev/xvda'
+          Ebs: 
+            DeleteOnTermination: true
+            Encrypted: false
+            VolumeSize: 100
+      InstanceType: !Ref pInstanceType
+      KeyName: !Ref pKeyName
+      SecurityGroupIds: 
+        - !GetAtt rEC2SG.GroupId
+      SubnetId: !Ref pSubnetId
+      UserData:
+        'Fn::Base64': !Sub |
+            #!/bin/bash
+            aws sns publish --phone-number '${pPhoneNumber}' --message 'EC2 ALERT: Instance type ${pInstanceType} has been created in ${AWS::Region}' --region ${AWS::Region}
+            echo "@reboot root /bin/aws sns publish --phone-number '${pPhoneNumber}' --message 'EC2 ALERT: Instance type ${pInstanceType} has started/rebooted in ${AWS::Region}' --region ${AWS::Region}" >> /etc/crontab
+            echo "59 * * * * root /bin/aws sns publish --phone-number '${pPhoneNumber}' --message 'EC2 ALERT: Instance type ${pInstanceType} is currently running in ${AWS::Region}' --region ${AWS::Region}" >> /etc/crontab
