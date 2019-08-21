@@ -12,7 +12,7 @@ This is used as a reminder that an instance is running (useful if running a a la
   * Alerts when instance starts/reboots  
   * Alerts every hour that instance is running  
     
-![alert-text.png](img/alert-text.png | width=100)  
+![alert-text.png](https://cdn.russerya.com/github-img/ec2-test-instance/alert-text.png)  
 
 ## Config File  
 
